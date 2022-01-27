@@ -10,28 +10,36 @@ public class MarkdownParse {
         // find the next [, then find the ], then find the (, then take up to
         // the next )
         int currentIndex = 0;
+        int openParen = 0;
+        int nextOpenBracket = 0;
+        int nextCloseBracket = 0;
+        int closeParen = 0;
         while(currentIndex < markdown.length()) {
-            System.out.println(currentIndex);
-            int nextOpenBracket = markdown.indexOf("[", currentIndex);
+            nextOpenBracket = markdown.indexOf("[", currentIndex);
+            if (currentIndex > 0 && markdown.indexOf("!", currentIndex) == nextOpenBracket - 1) {
+                currentIndex = nextOpenBracket + 1;
+                continue;
+            }
             if (nextOpenBracket >= 0) {
-                int openParen = markdown.indexOf("(", nextCloseBracket);
-                int nextCloseBracket = markdown.indexOf("]", nextOpenBracket);
+                openParen = markdown.indexOf("(", currentIndex);
+                nextCloseBracket = markdown.indexOf("]", nextOpenBracket);
                 if (openParen > 0 && nextCloseBracket == openParen - 1) {
-                    int closeParen = markdown.indexOf(")", openParen);
-                    if (closeParen >= 0); {
-                        toReturn.add(markdown.substring(openParen + 1, closeParen));
-
+                    closeParen = markdown.indexOf(")", openParen);
+                    if (closeParen >= 0) {
+                        if (markdown.substring(openParen + 1, closeParen).length() > 0) {
+                            toReturn.add(markdown.substring(openParen + 1, closeParen));
+                        }
                     }
                 }
-            }
-            else {
+            } else {
                 break;
             }
-
+           
             currentIndex = openParen + 1;
         }
         return toReturn;
     }
+ 
     public static void main(String[] args) throws IOException {
 		Path fileName = Path.of(args[0]);
 	    String contents = Files.readString(fileName);
